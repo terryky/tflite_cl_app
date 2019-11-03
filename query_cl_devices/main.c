@@ -3,6 +3,13 @@
 #include <string.h>
 #include <CL/cl.h>
 
+#define PRINT_PLATFORM_INFO_STR(pf_id, param_name)              \
+    do                                                          \
+    {                                                           \
+        char strbuf[1024];                                      \
+        clGetPlatformInfo (pf_id, param_name, sizeof(strbuf), strbuf, NULL); \
+        fprintf (stderr, " %-24s: %s\n", #param_name, strbuf);  \
+    } while (0)
 
 #define PRINT_DEVINFO_STR(dev_id, param_name)                  \
     do                                                         \
@@ -55,6 +62,11 @@ query_cldev (cl_device_id device)
     PRINT_DEVINFO_STR(device, CL_DEVICE_NAME);
     PRINT_DEVINFO_STR(device, CL_DEVICE_VENDOR);
     PRINT_DEVINFO_STR(device, CL_DRIVER_VERSION);
+    PRINT_DEVINFO_STR(device, CL_DEVICE_OPENCL_C_VERSION);
+    PRINT_DEVINFO_STR(device, CL_DEVICE_PROFILE);
+
+    PRINT_DEVINFO_BOOL(device, CL_DEVICE_AVAILABLE);
+    PRINT_DEVINFO_BOOL(device, CL_DEVICE_COMPILER_AVAILABLE);
 
     cl_device_type type;
     clGetDeviceInfo(device, CL_DEVICE_TYPE, sizeof(type), &type, NULL);
@@ -67,6 +79,9 @@ query_cldev (cl_device_id device)
     if (type & CL_DEVICE_TYPE_DEFAULT)
         fprintf (stderr, "  %-40s: %s\n", "CL_DEVICE_TYPE", "CL_DEVICE_TYPE_DEFAULT");
 
+    PRINT_DEVINFO_STR(device, CL_DEVICE_EXTENSIONS);
+
+    PRINT_DEVINFO_UINT(device, CL_DEVICE_VENDOR_ID);
     PRINT_DEVINFO_UINT(device, CL_DEVICE_MAX_COMPUTE_UNITS);
     PRINT_DEVINFO_UINT(device, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS);
 
@@ -91,6 +106,8 @@ query_cldev (cl_device_id device)
     clGetDeviceInfo(device, CL_DEVICE_GLOBAL_MEM_SIZE, sizeof(mem_size), &mem_size, NULL);
     fprintf (stderr, "  %-40s: %u MByte\n", "CL_DEVICE_GLOBAL_MEM_SIZE", (unsigned int)(mem_size / (1024 * 1024)));
 
+    PRINT_DEVINFO_BOOL(device, CL_DEVICE_ENDIAN_LITTLE);
+    PRINT_DEVINFO_BOOL(device, CL_DEVICE_HOST_UNIFIED_MEMORY);
     PRINT_DEVINFO_BOOL(device, CL_DEVICE_ERROR_CORRECTION_SUPPORT);
 
     cl_device_local_mem_type mem_type;
@@ -127,6 +144,15 @@ query_cldev (cl_device_id device)
     PRINT_DEVINFO_UINT(device, CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG  );
     PRINT_DEVINFO_UINT(device, CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT );
     PRINT_DEVINFO_UINT(device, CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE);
+    PRINT_DEVINFO_UINT(device, CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF  );
+
+    PRINT_DEVINFO_UINT(device, CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR  );
+    PRINT_DEVINFO_UINT(device, CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT );
+    PRINT_DEVINFO_UINT(device, CL_DEVICE_NATIVE_VECTOR_WIDTH_INT   );
+    PRINT_DEVINFO_UINT(device, CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG  );
+    PRINT_DEVINFO_UINT(device, CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT );
+    PRINT_DEVINFO_UINT(device, CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE);
+    PRINT_DEVINFO_UINT(device, CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF  );
 }
 
 
@@ -164,20 +190,17 @@ main (int argc, const char** argv)
         cl_platform_id pf_id = pf_ids[i];
         cl_uint      num_devices;
         cl_device_id *devices;
-        char strbuf[1024];
 
         fprintf (stderr, "\n");
         fprintf (stderr, "--------------------------------------------------------\n");
         fprintf (stderr, " OpenCL Platform [%d/%d]\n", i, num_platforms);
         fprintf (stderr, "--------------------------------------------------------\n");
 
-        ret = clGetPlatformInfo (pf_id, CL_PLATFORM_NAME, sizeof(strbuf), strbuf, NULL);
-        CLASSERT_AND_RET(ret);
-        fprintf (stderr, " CL_PLATFORM_NAME   : %s\n", strbuf);
-
-        ret = clGetPlatformInfo (pf_id, CL_PLATFORM_VERSION, sizeof(strbuf), strbuf, NULL);
-        CLASSERT_AND_RET(ret);
-        fprintf (stderr, " CL_PLATFORM_VERSION: %s\n", strbuf);
+        PRINT_PLATFORM_INFO_STR(pf_id, CL_PLATFORM_NAME);
+        PRINT_PLATFORM_INFO_STR(pf_id, CL_PLATFORM_VENDOR);
+        PRINT_PLATFORM_INFO_STR(pf_id, CL_PLATFORM_VERSION);
+        PRINT_PLATFORM_INFO_STR(pf_id, CL_PLATFORM_PROFILE);
+        PRINT_PLATFORM_INFO_STR(pf_id, CL_PLATFORM_EXTENSIONS);
 
         ret = clGetDeviceIDs (pf_id, CL_DEVICE_TYPE_ALL, 0, NULL, &num_devices);
         CLASSERT_AND_RET(ret);
