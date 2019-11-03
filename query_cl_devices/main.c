@@ -162,7 +162,7 @@ int
 main (int argc, const char** argv) 
 {
     cl_platform_id* pf_ids;
-    cl_uint i, num_platforms;
+    cl_uint i, j, num_platforms;
     cl_int ret;
 
 
@@ -221,14 +221,14 @@ main (int argc, const char** argv)
         ret = clGetDeviceIDs (pf_id, CL_DEVICE_TYPE_ALL, num_devices, devices, &num_devices);
         CLASSERT_AND_RET(ret);
 
-        for (i = 0; i < num_devices; i++)
+        for (j = 0; j < num_devices; j++)
         {
             fprintf (stderr, "\n");
             fprintf (stderr, " ----------------------------------\n");
-            fprintf (stderr, "  CL Device [%d/%d]\n", i, num_devices);
+            fprintf (stderr, "  CL Device [%d/%d]\n", j, num_devices);
             fprintf (stderr, " ----------------------------------\n");
 
-            query_cldev (devices[i]);
+            query_cldev (devices[j]);
         }
     }
 }
