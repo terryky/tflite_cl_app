@@ -92,4 +92,32 @@ cl_build_kernel (const char *text, char *entry_point)
 }
 
 
+void
+cl_query_kernel_info (cl_kernel kernel)
+{
+    size_t   val_sz;
+    size_t   val_sz3[3];
+    cl_ulong val_ul;
+    cl_int   ret;
+
+    ret = clGetKernelWorkGroupInfo (kernel, s_dev, CL_KERNEL_PRIVATE_MEM_SIZE, sizeof(val_sz), &val_sz, NULL);
+    DBG_ASSERT (ret == CL_SUCCESS, "clGetKernelWorkGroupInfo\n");
+    fprintf (stderr, "CL_KERNEL_PRIVATE_MEM_SIZE                  : %zu\n", val_sz);
+
+    ret = clGetKernelWorkGroupInfo (kernel, s_dev, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, sizeof(val_sz3), &val_sz3, NULL);
+    DBG_ASSERT (ret == CL_SUCCESS, "clGetKernelWorkGroupInfo\n");
+    fprintf (stderr, "CL_KERNEL_COMPILE_WORK_GROUP_SIZE           : (%zu, %zu, %zu)\n", val_sz3[0], val_sz3[1], val_sz3[2]);
+
+    ret = clGetKernelWorkGroupInfo (kernel, s_dev, CL_KERNEL_LOCAL_MEM_SIZE, sizeof(val_ul), &val_ul, NULL);
+    DBG_ASSERT (ret == CL_SUCCESS, "clGetKernelWorkGroupInfo\n");
+    fprintf (stderr, "CL_KERNEL_LOCAL_MEM_SIZE                    : %lu\n", val_ul);
+
+    ret = clGetKernelWorkGroupInfo (kernel, s_dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(val_sz), &val_sz, NULL);
+    DBG_ASSERT (ret == CL_SUCCESS, "clGetKernelWorkGroupInfo\n");
+    fprintf (stderr, "CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE: %zu\n", val_sz);
+
+    ret = clGetKernelWorkGroupInfo (kernel, s_dev, CL_KERNEL_PRIVATE_MEM_SIZE, sizeof(val_ul), &val_ul, NULL);
+    DBG_ASSERT (ret == CL_SUCCESS, "clGetKernelWorkGroupInfo\n");
+    fprintf (stderr, "CL_KERNEL_PRIVATE_MEM_SIZE                  : %lu\n", val_ul);
+}
  

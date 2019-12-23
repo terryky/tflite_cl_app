@@ -14,5 +14,6 @@ cl_kernel   cl_build_kernel (const char *text, char *entry_point);
 cl_context          cl_get_context ();
 cl_command_queue    cl_get_cmd_queue ();
 
+void cl_query_kernel_info (cl_kernel kernel);
 
 #endif /* _UTIL_CL_H_ */
