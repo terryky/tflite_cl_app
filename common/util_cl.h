@@ -19,4 +19,12 @@ cl_command_queue    cl_get_cmd_queue ();
 
 void cl_query_kernel_info (cl_kernel kernel);
 
+
+#if 1
+    void cl_assert (int err, char *fname, int nLine);
+    #define CLASSERT(err) cl_assert (err, __FILE__, __LINE__)
+#else
+    #define CLASSERT(err) ((void)0)
+#endif
+
 #endif /* _UTIL_CL_H_ */
