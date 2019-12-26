@@ -27,7 +27,7 @@ main (int argc, char *argv[])
     decode_tga_from_file ("food.tga", img_buf_src);
 
     ret = cl_init ();
-    DBG_ASSERT (ret == CL_SUCCESS, "clCreateBuffer\n");
+    CLASSERT(ret);
 
     ctx   = cl_get_context ();
     queue = cl_get_cmd_queue ();
@@ -40,17 +40,17 @@ main (int argc, char *argv[])
     cl_mem dst_mem = clCreateBuffer(ctx, CL_MEM_READ_WRITE, img_buf_size, NULL, NULL);
 
     ret = clEnqueueWriteBuffer (queue, src_mem, CL_TRUE, 0, img_buf_size, img_buf_src, 0, NULL, NULL);
-    DBG_ASSERT (ret == CL_SUCCESS, "clEnqueueWriteBuffer\n");
+    CLASSERT(ret);
 
     ret = clSetKernelArg(kernel, 0, sizeof(cl_mem), &dst_mem);
-    DBG_ASSERT (ret == CL_SUCCESS, "clSetKernelArg\n");
+    CLASSERT(ret);
 
     ret = clSetKernelArg(kernel, 1, sizeof(cl_mem), &src_mem);
-    DBG_ASSERT (ret == CL_SUCCESS, "clSetKernelArg\n");
+    CLASSERT(ret);
 
     int size[2] = {img_w, img_h};
     ret = clSetKernelArg(kernel, 2, sizeof(size), size);
-    DBG_ASSERT (ret == CL_SUCCESS, "clSetKernelArg\n");
+    CLASSERT(ret);
 
     size_t global_work_size[3] = {img_w, img_h, 0};
     size_t local_work_size[3]  = {8, 8, 0};
@@ -60,10 +60,10 @@ main (int argc, char *argv[])
             global_work_size[0], global_work_size[1], local_work_size[0], local_work_size[1]);
 
     ret = clEnqueueNDRangeKernel (queue, kernel, 2, NULL, global_work_size, local_work_size, 0, NULL, NULL);
-    DBG_ASSERT (ret == CL_SUCCESS, "clEnqueueNDRangeKernel\n");
+    CLASSERT(ret);
 
     ret = clEnqueueReadBuffer (queue, dst_mem, CL_TRUE, 0, img_buf_size, img_buf_dst, 0, NULL, NULL);
-    DBG_ASSERT (ret == CL_SUCCESS, "clEnqueueReadBuffer\n");
+    CLASSERT(ret);
 
     save_to_tga_file ("food_edge.tga", img_buf_dst, img_w, img_h);
 
