@@ -121,6 +121,24 @@ cl_build_kernel_from_file (char *dir_name, char *src_fname, char *entry_point)
     return kernel;
 }
 
+/* ----------------------------------------------------------- *
+ *   adjust global work size.
+ * ----------------------------------------------------------- */
+void
+cl_adjust_work_size (int numdim, size_t *global_work_size, size_t *local_work_size)
+{
+    for (int i = 0; i < numdim; i ++)
+    {
+        int gsize = global_work_size[i];
+        int lsize = local_work_size[i];
+        if (lsize == 0) lsize = 1;
+
+        int num = (gsize + lsize - 1) / lsize;  /* ceil */
+        global_work_size[i] = num * lsize;
+        local_work_size [i] = lsize;
+    }
+}
+
 
 void
 cl_query_kernel_info (cl_kernel kernel)

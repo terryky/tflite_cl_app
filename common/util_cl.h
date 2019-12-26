@@ -12,6 +12,8 @@ cl_int      cl_init ();
 cl_kernel   cl_build_kernel (const char *text, char *entry_point);
 cl_kernel   cl_build_kernel_from_file (char *dir, char *fname, char *entry_point);
 
+void cl_adjust_work_size (int numdim, size_t *global_work_size, size_t *local_work_size);
+
 cl_context          cl_get_context ();
 cl_command_queue    cl_get_cmd_queue ();
 
