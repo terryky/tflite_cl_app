@@ -4,6 +4,10 @@
  * ------------------------------------------------ */
 #include <stdio.h>
 #include <string.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include "util_cl.h"
 #include "util_debug.h"
 
@@ -87,6 +91,32 @@ cl_build_kernel (const char *text, char *entry_point)
 
     kernel = clCreateKernel (prog, entry_point, &ret);
     DBG_ASSERT (ret == CL_SUCCESS, "clBuildProgram\n");
+
+    return kernel;
+}
+
+cl_kernel
+cl_build_kernel_from_file (char *dir_name, char *src_fname, char *entry_point)
+{
+    cl_kernel kernel;
+    int  fd;
+    void *buf;
+    struct stat st;
+    char src_path[128];
+
+    snprintf (src_path, sizeof(src_path), "%s/%s", dir_name, src_fname);
+
+    fd = open (src_path, O_RDONLY | O_CLOEXEC);
+    DBG_ASSERT (fd >= 0, "failed to open %s\n", src_path);
+
+    fstat (fd, &st);
+    buf = mmap (0, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+    close (fd);
+    if (buf == MAP_FAILED)
+        return 0;
+
+    kernel = cl_build_kernel (buf, entry_point);
+    munmap (buf, st.st_size);
 
     return kernel;
 }
